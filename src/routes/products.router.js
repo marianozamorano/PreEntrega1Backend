@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const fs = require("fs").promises;
 
 const products = [];
 
@@ -35,6 +36,9 @@ router.post("/", (req, res) => {
     };
 
     products.push(newProduct);
+
+    io.emit("updateProducts", products);
+
     res.status(201).json({ status: "success", message: "Producto creado correctamente", product: newProduct });
 });
 
@@ -57,6 +61,9 @@ router.delete("/:pid", (req, res) => {
 
     if (deletedProductIndex !== -1) {
         const deletedProduct = products.splice(deletedProductIndex, 1);
+
+        io.emit("updateProducts", products);
+        
         res.json({ status: "success", message: "Producto eliminado correctamente", product: deletedProduct });
     } else {
         res.status(404).send("Producto no encontrado");
